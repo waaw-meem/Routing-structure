@@ -1,27 +1,47 @@
-# FirstApp
+# Introduction of Routing
+It will help to move from one page to another page (navigation)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.7.
+# How to use Routing? How to implement Routing?
+Step 01: Import "Routes" and "RouterModule" from "@angular/router"
 
-## Development server
+Step 02: Create a const variable to assign a routing in that variable such as:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+const appRoutes: Routes = [
+    {path:'users',component:'UserComponent'}
+]
 
-## Code scaffolding
+Step 03: Now Add "RouterModule" in imports with this statement "RouterModule.forRoot(appRoutes)"
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# How we know that at which place we render content of menu?
+Just Add this tag to load the content of component "<router-outlet></router-outlet>"
 
-## Build
+# Navigation with Router Links
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Instead of "href" attribute we use "routerLink="/servers" or "[routerLink]="['/servers']""
+The second method is used to routing for multiple pages in which it shows different things according to the code or ID
 
-## Running unit tests
+# Path
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Relative path => "servers" and Absolute Path => './servers'
 
-## Running end-to-end tests
+# Styling Active Router Links
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+To create a menu active add this property "routerLinkActive='active'" in all "li" tag
+and add one thing more to start active from Home or main page include this as well 
+"routerLinkActiveOptions={exact:true}"
 
-## Further help
+# Navigating Program way
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+If you are moving from one html page to another then you will have to add click event then go to typescript file to create click event function with importing "Router" package and add in constructor
+
+constructor(private router:Router)
+
+and In function add this code
+
+"this.router.navigate(['/servers'])"
+
+# Relative and Absolute Path
+
+First thing is relative path give error with routerLink but it does not give any error with navigate method because it does not know at which current route the user is present so for that purpose we add "ActivatedRoute" package in Navigate method for Angular ot understand that where user is currently reside
+
+Important give absolute path except root path
