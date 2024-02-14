@@ -145,3 +145,15 @@ this.route.queryParams
  
 )
 </code>
+
+# Configuring the handling of Query parameters
+<code>this.router.navigate(['edit'],{relativeTo:this.route,queryParamsHandling:'preserve'})</code>
+
+We use queryParamsHandling preserve because we want query parameter in url after clicking on edit button
+
+# Redirect and Wildcards Routes
+
+
+
+
+# An Introduction of Guards
