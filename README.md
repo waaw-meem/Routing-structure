@@ -151,9 +151,150 @@ this.route.queryParams
 
 We use queryParamsHandling preserve because we want query parameter in url after clicking on edit button
 
-# Redirect and Wildcards Routes
 
 
+# An Introduction of Guards (Important)
+
+## canActivate
+
+CanActivate is an interface in Angular used to implement a guard to determine if a route can be activated or not. It's part of the Angular Router's guard feature, which allows you to run some code before a route is activated, enabling you to control access to that route based on certain conditions.
+
+The canActivate() method typically takes two parameters:
+
+ActivatedRouteSnapshot: Represents the route that is being activated. It contains information about the route, such as its URL, parameters, and any data associated with the route.
+
+RouterStateSnapshot: Represents the state of the router at the time the guard is run. It contains information about the current route tree, including the URL, parameters, and the route itself.
 
 
-# An Introduction of Guards
+## canActivateChild
+
+CanActivateChild is another interface provided by Angular's router guards. It's similar to CanActivate, but it specifically deals with guarding child routes of a particular route.
+
+## Controlling Navigation with canDeactivate
+
+
+CanDeactivate is an interface provided by Angular's router guards. It allows you to control whether a route can be deactivated or not. When a user navigates away from a route, Angular checks if there's a CanDeactivate guard associated with that route. If there is, Angular invokes the canDeactivate() method of that guard.
+
+### Why we use CanDeactivate:
+Confirmation for Navigation: It allows you to prompt users for confirmation before they navigate away from a route, especially if there are unsaved changes on the page.
+
+Validation: It enables you to perform validation checks before allowing navigation, ensuring that the user's input or actions meet certain criteria.
+
+Preventing Unwanted Navigation: It provides a mechanism to prevent users from navigating away from a route under specific conditions, such as during a critical operation or when certain prerequisites haven't been met.
+
+<p>
+Explanation of the Provided Code:
+The provided code defines an interface CanComponentDeactivated and a guard CanDeactivatedGuard.
+
+CanComponentDeactivated Interface:
+
+This interface defines a contract for components that implement the canDeactivate method.
+The canDeactivate method returns an Observable<boolean>, Promise<boolean>, or boolean, indicating whether navigation can proceed (true) or not (false).
+Components implementing this interface must provide their own implementation of the canDeactivate method.
+CanDeactivatedGuard Class:
+
+This class implements the CanDeactivate interface, specifying the type of component it guards (CanComponentDeactivated).
+It defines the canDeactivate method, which is called by Angular's router when determining whether navigation from a route is allowed.
+The canDeactivate method receives the component instance (component) along with information about the current route, current state, and next state.
+Inside the canDeactivate method, it invokes the canDeactivate method of the component instance (provided it implements the CanComponentDeactivated interface) to determine if navigation should be allowed.
+The method returns a boolean, UrlTree, Observable<boolean | UrlTree>, or Promise<boolean | UrlTree>, indicating whether navigation should proceed (true) or not (false), or a URL tree representing the destination if the navigation should be redirected.
+</p>
+
+## Passing Static Data to Route
+
+Passing static data to a route is a common practice in Angular applications. It allows you to provide additional information to a component when it's instantiated via routing. There are several reasons why you might want to use this feature:
+
+Configuration Data: You can use static data to pass configuration settings or metadata to a component. This can include information like titles, descriptions, or any other data that the component needs to render itself properly.
+
+Localization: Static data can be used to pass localized strings or labels to a component, allowing it to display content in different languages based on the user's preferences.
+
+Security: Static data can also include security-related information such as user roles or permissions. This data can be used by the component to determine which features or functionalities should be accessible to the user.
+
+Performance: By pre-loading data with the route, you can improve performance by reducing the need for additional HTTP requests or data fetching operations when the component is loaded.
+
+Consistency: Passing static data ensures that the component always receives the same data when it's instantiated via routing, which helps maintain consistency in your application's behavior.
+
+Here's an example of how you can pass static data to a route in Angular:
+
+
+<code> 
+const routes: Routes = [
+  { 
+    path: 'product/:id', 
+    component: ProductComponent, 
+    data: { 
+      title: 'Product Details', 
+      description: 'This page displays details about a product' 
+    } 
+  }
+];
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-product',
+  templateUrl: './product.component.html',
+  styleUrls: ['./product.component.css']
+})
+export class ProductComponent implements OnInit {
+  title: string;
+  description: string;
+
+  constructor(private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    this.title = this.route.snapshot.data.title;
+    this.description = this.route.snapshot.data.description;
+  }
+}
+
+
+</code>
+
+
+# Resolving Dynamic Data with the resolve guard
+
+<p>
+Resolve guards in Angular are used to fetch data before the route is activated and the component is loaded. They help ensure that the required data is available before the component is rendered, providing a smooth user experience and preventing the component from being displayed with incomplete or missing data. Resolve guards are particularly useful in scenarios where components depend on data that needs to be fetched asynchronously, such as from a server or via a complex computation.
+
+Here are some reasons why we use resolve guards:
+
+Data Pre-loading: Resolve guards allow us to pre-load data before the route is activated, ensuring that the component has access to the required data as soon as it's rendered. This helps avoid delays in displaying the component content and provides a better user experience.
+
+Consistent Data: Resolve guards ensure that the component always receives the same data when it's instantiated via routing. This helps maintain consistency in the application's behavior and prevents unexpected changes in data between different route activations.
+
+Avoiding Race Conditions: Resolve guards help avoid race conditions that can occur when multiple components try to fetch data simultaneously. By resolving data before activating the route, resolve guards ensure that components don't compete for the same data resources.
+
+Error Handling: Resolve guards provide a mechanism for handling errors that occur during data fetching. They allow us to gracefully handle errors, such as failed HTTP requests or data retrieval errors, and provide appropriate feedback to the user.
+
+Performance Optimization: Resolve guards can improve the performance of our application by pre-fetching data that the component will need. By resolving data before activating the route, we can reduce the latency associated with fetching data asynchronously when the component is loaded.
+
+Overall, resolve guards help ensure that our components have access to the required data when they're rendered, providing a seamless user experience and helping to optimize the performance of our Angular applications.
+</p>
+
+<code>
+export class ServerResolver implements Resolve<Server> {
+    constructor(private serverService: ServersService) {}
+
+    resolve(
+        route: ActivatedRouteSnapshot, 
+        state: RouterStateSnapshot
+    ): Observable<Server> | Promise<Server> | Server {
+        const serverId = route.params.id;
+        return this.serverService.getServer(serverId);
+    }
+</code>
+
+Class Definition:
+
+export class ServerResolver implements Resolve<Server> { ... }: This defines the ServerResolver class and specifies that it implements the Resolve<Server> interface. The Resolve interface is provided by Angular's router module and is used to create route resolvers, which resolve data before activating a route.
+Constructor:
+
+constructor(private serverService: ServersService) { ... }: This is the class constructor. It accepts an instance of the ServersService class as a parameter and injects it into the ServerResolver class. This allows the resolver to use the ServersService to fetch server data.
+Resolve Method:
+
+resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Server> | Promise<Server> | Server { ... }: This method is part of the Resolve interface and is required to be implemented by classes that implement the interface. It is responsible for resolving data before activating a route.
+const serverId = route.params.id;: This extracts the id parameter from the route snapshot. This likely represents the ID of the server whose details need to be fetched.
+return this.serverService.getServer(serverId);: This calls the getServer method of the ServersService class to fetch server data based on the serverId. The method returns an Observable, Promise, or server object, depending on the return type specified in the method signature.
